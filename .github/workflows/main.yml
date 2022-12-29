@@ -1,0 +1,37 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Synopsys Security Testing
+
+on:
+  push:
+    branches: [ master, main ]
+
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Synopsys Action
+        uses: synopsys-sig/synopsys-action@v0.2.0
+        with:
+          polaris_serverUrl: ${{ secrets.POLARIS_SERVER_URL }}
+          polaris_accessToken: ${{ secrets.POLARIS_ACCESS_TOKEN }}
+          polaris_application_name: "MRB-App"
+          polaris_project_name: "ghtest"
+          polaris_assessment_types: "[\"SCA\", \"SAST\"]"
+
+          blackduck_apiToken: ${{ secrets.BLACKDUCK_API_TOKEN }}
+          blackduck_url: ${{ secrets.BLACKDUCK_URL }}
+
+          # Optional parameter. By default, pushes will initiate a full "intelligent" scan and pull requests
+          # will initiate a rapid scan.
+          blackduck_scan_full: false
+
+          # Optional parameter. The values could be. ALL|NONE|BLOCKER|CRITICAL|MAJOR|MINOR|OK|TRIVIAL|UNSPECIFIED
+          #blackduck_scan_failure_severities: CRITICAL
+          bridge_download_url: https://sig-repo.synopsys.com/artifactory/bds-integrations-release/com/synopsys/integration/synopsys-action/0.1.114/ci-package-0.1.114-linux64.zip
